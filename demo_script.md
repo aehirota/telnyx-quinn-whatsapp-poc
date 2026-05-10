@@ -23,18 +23,28 @@ webhook server already running before the call starts.
 ## 5:00–20:00 — Live demo
 
 **Setup checklist (do this BEFORE the call):**
-- [ ] Webhook running: `python tools/webhook_receiver.py` in a visible terminal
-- [ ] `.env` loaded with `ANTHROPIC_API_KEY`
-- [ ] `output/salesforce_mock.json` exists with one pre-seeded lead (so it's not an empty-state demo)
+- [ ] Webhook running on port 5050: `python tools/webhook_receiver.py` in a visible terminal (port 5050 is the default; AirPlay Receiver squats on 5000 on macOS)
+- [ ] `.env` loaded with `ANTHROPIC_API_KEY` and `WEBHOOK_PORT=5050`
+- [ ] `output/salesforce_mock.json` reset to just the Lucas Pereira seed (`git checkout output/salesforce_mock.json` if needed)
 - [ ] Second terminal open, ready to run `python main.py`
+- [ ] One smoke test before the call: run `python main.py` and verify it succeeds, then reset the mock again
+
+**If something breaks live:**
+- Webhook crashed → Ctrl+C the runaway, restart `python tools/webhook_receiver.py`, re-fire `python main.py`
+- Network/Claude error → fall back to the pre-seeded record: "Here's a previous run from yesterday — the architecture is the same"
+- Terminal output garbled → `clear && python main.py` to give a clean frame
+- All else fails → switch to the architecture diagram + code walkthrough early; you've already shown the demo works in your README screenshots/recording
 
 **Demo sequence:**
 
-1. **Show the pre-seeded "CRM"** — `cat output/salesforce_mock.json` → one prior lead, source=WhatsApp
-2. **Hot lead** — `python main.py` → fintech named Conta Simples, hot ICP + intent, routed to SDR, reply asks one clarifying question
-3. **Warm lead** — `python main.py --message-id msg-002-warm-latam` → exploratory, marketing nurture, reply shares a doc link
-4. **Cold deflect** — `python main.py --message-id msg-003-cold-noise` → consumer asking about a lost phone, deflected politely
-5. **Show Salesforce** — `cat output/salesforce_mock.json` → all three new leads logged with full qualification context
+1. **Show the pre-seeded "CRM"** — `cat output/salesforce_mock.json` → one prior lead (Lucas Pereira/Olist), source=WhatsApp
+2. **Hot lead** — `python main.py` → fintech named Conta Simples, `high/high → sdr_followup`, reply asks one clarifying question + promises 4-hour SDR follow-up
+3. **Warm lead** — `python main.py --message-id msg-002-warm-latam` → SMS pricing inquiry from Rafael, `medium/medium → sdr_followup` (the mechanical rule routes both-medium to humans), reply asks expected monthly volume
+4. **Cold deflect** — `python main.py --message-id msg-003-cold-noise` → consumer asking about a lost phone, `low/low → deflect`, polite redirect to mobile carrier
+5. **Show Salesforce** — `cat output/salesforce_mock.json` → 4 leads now (1 seed + 3 demo runs), full qualification context on each
+
+**Callout to land during the warm lead beat:**
+> "You'll notice this is `medium/medium` and still routed to SDR — that's deliberate. I tuned the rule to err on routing to humans, because losing a qualified lead to a nurture sequence is more expensive than the SDR time to triage one. The `marketing_nurture` path triggers when intent is genuinely low (e.g., 'what do you do?' with no business context). None of these three samples hit that case."
 
 **What to call out while it runs:**
 - The latency (~5–7 seconds end-to-end — fast for an async channel where users tolerate seconds-to-minutes for human replies; the "Quinn is thinking..." indicator covers it)
@@ -87,9 +97,9 @@ Frame this as: "You hired me, what does week one and week two look like?"
 
 2. **Week 2 — Live Telnyx WhatsApp Business.** Once GA credentials exist, swap the mock webhook. Less than a day of work because the contract is already defined in the SOP.
 
-3. **Week 3 — Outbound WhatsApp sequences.** Today Quinn outbounds via 10 mailboxes. Adding WhatsApp as an outbound channel for LATAM doubles the surface area without doubling the SDR cost.
+3. **Week 3 — Outbound WhatsApp sequences.** Today Quinn outbounds via 10 mailboxes. Adding WhatsApp as an outbound channel for LATAM doubles the surface area without doubling the SDR cost. This is where we'd actually need a workflow engine (Temporal, Prefect, or LangGraph) — durable timers + multi-day state. The pipeline pattern stops fitting and we graduate to a real orchestrator.
 
-4. **Week 4+ — Conversation memory.** Multi-turn qualification flow. The single-message demo is the floor, not the ceiling.
+4. **Week 4+ — Conversation memory.** Multi-turn qualification via LangChain `ChatMessageHistory`. The single-message demo is the floor, not the ceiling — a real LATAM lead might take 3–5 messages to qualify properly.
 
 **Closing line:**
 > "The reason this took two days, not two weeks, is that the architecture

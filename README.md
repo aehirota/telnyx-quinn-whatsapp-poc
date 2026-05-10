@@ -111,3 +111,4 @@ Full SOP and prompts: [workflows/whatsapp-qualification.md](workflows/whatsapp-q
 | `mock_data/sample_messages.json` | Three Telnyx-shaped sample payloads |
 | `output/salesforce_mock.json` | The "CRM" — pre-seeded with one prior lead |
 | `demo_script.md` | 35-minute presentation script |
+| `diagrams/` | Excalidraw architecture diagrams (overview + LangChain internals of each LLM tool); see [`diagrams/README.md`](diagrams/README.md) |
