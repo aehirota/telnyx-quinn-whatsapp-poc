@@ -1,0 +1,62 @@
+[
+  {
+    "id": "msg-001-hot-latam",
+    "description": "Strong ICP fit, high intent — mid-market Brazilian fintech evaluating voice API",
+    "payload": {
+      "data": {
+        "event_type": "message.received",
+        "id": "evt_01HXW7K3M9N2P4Q6R8T0V2X4Z6",
+        "occurred_at": "2026-05-10T14:23:11.482Z",
+        "payload": {
+          "id": "msg_01HXW7K3M9N2P4Q6R8T0V2X4Z7",
+          "from": {"phone_number": "+5511987654321", "profile_name": "Mariana Costa"},
+          "to": [{"phone_number": "+15558675309"}],
+          "text": "Oi, sou da Conta Simples, estamos procurando uma alternativa pra Twilio pro nosso time de suporte que atende uns 8 mil clientes PJ. Voces tem voice API com presenca no Brasil? Precisamos rodar um POC ate o fim do mes.",
+          "type": "WhatsApp",
+          "received_at": "2026-05-10T14:23:11.000Z"
+        }
+      },
+      "meta": {"attempt": 1, "delivered_to": "https://quinn.telnyx.com/webhook/whatsapp"}
+    }
+  },
+  {
+    "id": "msg-002-warm-latam",
+    "description": "Medium fit, exploratory intent — Brazilian dev comparing options",
+    "payload": {
+      "data": {
+        "event_type": "message.received",
+        "id": "evt_02HXW7K3M9N2P4Q6R8T0V2X4Z8",
+        "occurred_at": "2026-05-10T15:01:44.112Z",
+        "payload": {
+          "id": "msg_02HXW7K3M9N2P4Q6R8T0V2X4Z9",
+          "from": {"phone_number": "+5521991234567", "profile_name": "Rafael Almeida"},
+          "to": [{"phone_number": "+15558675309"}],
+          "text": "Boa tarde, estou pesquisando provedores de SMS pra um projeto novo. Qual o preco de voces pra Brasil e como funciona a integracao?",
+          "type": "WhatsApp",
+          "received_at": "2026-05-10T15:01:44.000Z"
+        }
+      },
+      "meta": {"attempt": 1, "delivered_to": "https://quinn.telnyx.com/webhook/whatsapp"}
+    }
+  },
+  {
+    "id": "msg-003-cold-noise",
+    "description": "Out of ICP — consumer asking about personal phone number",
+    "payload": {
+      "data": {
+        "event_type": "message.received",
+        "id": "evt_03HXW7K3M9N2P4Q6R8T0V2X4ZA",
+        "occurred_at": "2026-05-10T15:42:08.000Z",
+        "payload": {
+          "id": "msg_03HXW7K3M9N2P4Q6R8T0V2X4ZB",
+          "from": {"phone_number": "+5531998877665", "profile_name": "Joao Silva"},
+          "to": [{"phone_number": "+15558675309"}],
+          "text": "Ola, perdi meu celular e preciso recuperar meu numero. Voces conseguem ajudar?",
+          "type": "WhatsApp",
+          "received_at": "2026-05-10T15:42:08.000Z"
+        }
+      },
+      "meta": {"attempt": 1, "delivered_to": "https://quinn.telnyx.com/webhook/whatsapp"}
+    }
+  }
+]

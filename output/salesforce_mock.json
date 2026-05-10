@@ -1,0 +1,20 @@
+[
+  {
+    "record_id": "lead_1746800000000",
+    "source_channel": "WhatsApp",
+    "phone": "+5511933334444",
+    "name": "Lucas Pereira",
+    "company_guess": "Olist",
+    "language": "pt",
+    "is_latam": true,
+    "icp_fit": "high",
+    "intent": "high",
+    "routing": "sdr_followup",
+    "use_case": "Migrating SMS notifications from Twilio to a Brazil-local provider",
+    "original_message": "Oi, somos da Olist e estamos avaliando trocar a Twilio por um provedor com presenca local no Brasil. Voces tem rota direta com as operadoras?",
+    "quinn_reply": "Hi Lucas — yes, Telnyx runs direct carrier interconnects in Brazil. Quick question: roughly what's your current monthly SMS volume? A human SDR will follow up within 4 business hours with pricing tailored to your scale.",
+    "received_at": "2026-05-09T18:14:22.000Z",
+    "telnyx_message_id": "msg_seed_001",
+    "logged_at": "2026-05-09T18:14:24.118Z"
+  }
+]
