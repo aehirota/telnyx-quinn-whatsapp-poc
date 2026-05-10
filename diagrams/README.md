@@ -6,9 +6,21 @@ Excalidraw scene files for the architecture and LangChain internals of this POC.
 
 | File | What it shows |
 |------|---------------|
-| [`architecture-overview.excalidraw`](architecture-overview.excalidraw) | End-to-end flow: `mock_data → main.py → Flask /webhook → 4 tools → salesforce_mock.json` |
-| [`qualification-engine-internals.excalidraw`](qualification-engine-internals.excalidraw) | Inside `tools/qualification_engine.py` — the LCEL chain, the `ChatAnthropic` config, and the full `Qualification` Pydantic schema |
-| [`response-generator-internals.excalidraw`](response-generator-internals.excalidraw) | Inside `tools/response_generator.py` — the simpler `prompt | llm` chain, plus a real example reply |
+| [`presentation-canvas.excalidraw`](presentation-canvas.excalidraw) | **All three diagrams stacked on one canvas** — built for live screen-share. Open this one during the demo and pan/zoom between sections instead of switching files. |
+| [`architecture-overview.mmd`](architecture-overview.mmd) | **Mermaid source** of the architecture overview — embedded inline in the main [`../README.md`](../README.md) so GitHub renders it without a click |
+| [`architecture-overview.excalidraw`](architecture-overview.excalidraw) | **Excalidraw version** of the same architecture overview — standalone, useful if you want just the overview in another context |
+| [`qualification-engine-internals.excalidraw`](qualification-engine-internals.excalidraw) | Standalone: inside `tools/qualification_engine.py` — the LCEL chain, the `ChatAnthropic` config, and the full `Qualification` Pydantic schema |
+| [`response-generator-internals.excalidraw`](response-generator-internals.excalidraw) | Standalone: inside `tools/response_generator.py` — the simpler `prompt | llm` chain, plus a real example reply |
+
+**Why three Excalidraw layouts?**
+- `presentation-canvas.excalidraw` — the live-demo file, all three sections stacked vertically with arrow callouts (`↓ Zoom into qualification_engine ↓`). Open this once, pan as you talk.
+- The three standalone files — useful if you want to embed just one section as a single image in a slide, README, LinkedIn post, etc.
+
+**Why architecture overview also has a Mermaid version?**
+- **Mermaid** renders inline on GitHub READMEs — lowest friction for a casual reader scanning the repo
+- **Excalidraw** has visual personality and supports rich annotations — better for slide decks and embedded screenshots
+
+The two internals diagrams are Excalidraw-only because they include Pydantic schema boxes and quoted example replies — content that doesn't fit cleanly in a Mermaid node label.
 
 ## How to view or edit
 

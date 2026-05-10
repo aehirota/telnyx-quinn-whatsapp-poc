@@ -65,17 +65,43 @@ cat output/salesforce_mock.json
 
 Separates the human-readable SOP (`workflows/`) from the executable code (`tools/`). Each tool is a tiny, independently swappable unit. The Flask handler orchestrates them sequentially because each step has a real data dependency on the previous one.
 
-```
-main.py                              # one-shot demo poster
-└──> POST /webhook
-     └── tools/webhook_receiver.py   # Flask, orchestrates the pipeline
-         ├── tools/language_detector.py    # langdetect, deterministic, no LLM
-         ├── tools/qualification_engine.py # LangChain ChatAnthropic + Pydantic structured output
-         ├── tools/response_generator.py   # LangChain ChatAnthropic + ChatPromptTemplate
-         └── tools/salesforce_logger.py    # append/update output/salesforce_mock.json (idempotent)
+```mermaid
+flowchart TD
+    Mock[mock_data]
+    Main[main.py]
+    Flask[Flask /webhook<br/>webhook_receiver.py · orchestrator]
+
+    Mock --> Main
+    Main -->|POST /webhook| Flask
+    Flask --> Lang
+
+    subgraph Tools[tools/ — sequential pipeline]
+        direction LR
+        Lang[language_detector<br/>langdetect · no LLM]
+        Qual[qualification_engine<br/>LangChain + Pydantic]
+        Resp[response_generator<br/>LangChain · reply]
+        Log[salesforce_logger<br/>JSON · idempotent]
+        Lang --> Qual --> Resp --> Log
+    end
+
+    Log --> SF[(salesforce_mock.json<br/>WhatsApp as source channel)]
+
+    classDef input fill:#fff3bf,stroke:#f59e0b,color:#1e1e1e
+    classDef entry fill:#a5d8ff,stroke:#4a9eed,color:#1e1e1e
+    classDef agent fill:#a5d8ff,stroke:#4a9eed,stroke-width:3px,color:#1e1e1e
+    classDef deterministic fill:#b2f2bb,stroke:#22c55e,color:#1e1e1e
+    classDef llm fill:#d0bfff,stroke:#8b5cf6,color:#1e1e1e
+    classDef storage fill:#c3fae8,stroke:#06b6d4,color:#1e1e1e
+
+    class Mock input
+    class Main entry
+    class Flask agent
+    class Lang deterministic
+    class Qual,Resp llm
+    class Log,SF storage
 ```
 
-Full SOP and prompts: [workflows/whatsapp-qualification.md](workflows/whatsapp-qualification.md). The SOP is stack-agnostic by design — when LangChain becomes Burr or anything else, the SOP stays the same.
+Full SOP and prompts: [workflows/whatsapp-qualification.md](workflows/whatsapp-qualification.md). The SOP is stack-agnostic by design — when LangChain becomes Burr or anything else, the SOP stays the same. For the deeper internals (LangChain pipe expression, Pydantic schema, example replies), see [`diagrams/`](diagrams/) — those use Excalidraw because they carry annotations Mermaid doesn't render well.
 
 ---
 
