@@ -38,35 +38,38 @@ and reliable enough without an LLM.
 
 **Tool:** `tools/qualification_engine.py`
 
-Calls Claude Sonnet with this contract:
+Calls Claude Sonnet via LangChain with a Pydantic-enforced output contract.
+
+**Implementation:**
+- `ChatPromptTemplate.from_messages([("system", SYSTEM_PROMPT), ("human", "...{message_text}...")])` — the prompt template
+- `ChatAnthropic(model=..., max_tokens=400)` — the LLM client
+- `_chain = _prompt | _llm.with_structured_output(Qualification)` — the LCEL chain with Pydantic schema enforcement
 
 **System prompt (paraphrased — see code for exact text):**
 > You are Quinn, Telnyx's AI SDR. Score this inbound WhatsApp message on two
 > dimensions: ICP fit (does the sender's company match Telnyx's target
 > profile — mid-market+, building communications products, technical buyer)
-> and intent (are they actively evaluating now, or just browsing). Return
-> strict JSON.
+> and intent (are they actively evaluating now, or just browsing).
+> Apply routing rules MECHANICALLY in order — do not override based on
+> additional judgment.
 
-**Required output JSON:**
-```json
-{
-  "icp_fit": "high" | "medium" | "low",
-  "intent": "high" | "medium" | "low",
-  "company_guess": "<company name extracted from message, or null>",
-  "use_case": "<one-line summary of what they want>",
-  "routing": "sdr_followup" | "marketing_nurture" | "deflect",
-  "reasoning": "<one sentence>"
-}
+**Output contract** (enforced by the `Qualification` Pydantic BaseModel — Claude cannot return any other shape):
+```python
+class Qualification(BaseModel):
+    icp_fit: Literal["high", "medium", "low"]
+    intent: Literal["high", "medium", "low"]
+    company_guess: str | None
+    use_case: str
+    routing: Literal["sdr_followup", "marketing_nurture", "deflect"]
+    reasoning: str
 ```
 
-**Routing rules:**
-- `icp_fit=high` AND `intent=high` → `sdr_followup` (loop in human SDR)
-- `icp_fit>=medium` AND `intent>=medium` → `sdr_followup`
-- `icp_fit=low` → `deflect` (polite redirect)
-- Otherwise → `marketing_nurture`
+**Routing rules** (apply MECHANICALLY in order, first match wins — the rules already account for nuance via the icp_fit/intent scores):
+1. `icp_fit=low` → `deflect` (polite redirect)
+2. `icp_fit` AND `intent` both at least `medium` → `sdr_followup` (loop in human SDR)
+3. else → `marketing_nurture`
 
-If Claude returns malformed JSON, fall back to `routing: "sdr_followup"` (fail
-safe — better to over-route than miss a hot lead).
+**Fail-safe:** if the LangChain call raises (network timeout, schema mismatch — rare with structured output, etc.), the engine returns a hardcoded `routing: "sdr_followup"` with `reasoning: "Qualification failed; routed to SDR by fail-safe rule."` Better to over-route than miss a hot lead.
 
 ---
 
@@ -142,6 +145,7 @@ This response is what `main.py` pretty-prints during the live demo.
 |---------|----------|
 | Malformed inbound JSON | HTTP 400, no retry |
 | `langdetect` raises | Default `language=unknown`, `is_latam=false`, continue |
-| Claude API timeout (>10s) | HTTP 504, log to stderr, no Salesforce write |
-| Claude returns non-JSON for qualification | Fall back to `sdr_followup` routing |
-| Salesforce file write fails | HTTP 500, no retry (Telnyx will redeliver) |
+| LangChain network/timeout error during qualification | Caught by try/except in `qualify()`, fall back to `routing: "sdr_followup"` with explanatory reasoning |
+| Pydantic `ValidationError` during qualification | Same fail-safe as above (Pydantic enforces the schema; ValidationError is rare with `with_structured_output()` since LangChain uses Claude's tool-use feature, but the wrapper catches it) |
+| LangChain network/timeout error during reply generation | Exception propagates to Flask handler, returns HTTP 500 (Telnyx will redeliver) |
+| Salesforce file write fails | HTTP 500, no retry (Telnyx will redeliver; logger is idempotent on next attempt) |

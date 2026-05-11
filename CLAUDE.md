@@ -49,10 +49,13 @@ Build a WhatsApp inbound qualification handler that extends Quinn with:
 
 ## Stack
 
-- **Language:** Python
-- **LLM backend:** Claude API (claude-sonnet-4-20250514)
-- **Web framework:** Flask (webhook receiver)
-- **Demo runner:** single `main.py` entry point
+- **Language:** Python 3.11+
+- **LLM orchestration:** LangChain (`ChatAnthropic` + `ChatPromptTemplate` + Pydantic-typed `.with_structured_output()`)
+- **LLM model:** Claude Sonnet (`claude-sonnet-4-20250514` by default; overridable via `CLAUDE_MODEL` env var)
+- **Web framework:** Flask (the `/webhook` orchestrator)
+- **Demo UI:** Streamlit (`ui/app.py` — default for live demo, posts to Flask)
+- **CLI fallback:** `main.py` (kept as the if-UI-breaks fallback)
+- **Schema enforcement:** Pydantic v2 (the `Qualification` model is the contract Claude must satisfy)
 - **No:** Zapier, n8n, no-code tools, prompt playgrounds
 
 ---
@@ -61,21 +64,37 @@ Build a WhatsApp inbound qualification handler that extends Quinn with:
 
 ```
 telnyx-quinn-whatsapp-poc/
-├── CLAUDE.md                          # This file
-├── .env                               # API keys — never commit
-├── main.py                            # Demo entry point — runs everything
+├── CLAUDE.md                          # This file — project charter, evaluation criteria
+├── README.md                          # Setup, run, what was built and why (repo entry point)
+├── demo_script.md                     # 35-minute presentation script with talk track
+├── requirements.txt                   # Python deps (Flask, LangChain, Pydantic, Streamlit, etc.)
+├── .env                               # API keys — never commit (gitignored)
+├── .env.example                       # Template for .env
+├── .gitignore                         # Excludes .env, .venv, __pycache__
+├── main.py                            # CLI fallback — POSTs a sample payload to Flask
 ├── workflows/
-│   └── whatsapp-qualification.md      # SOP for the full qualification flow
+│   └── whatsapp-qualification.md      # SOP for the full qualification flow (stack-agnostic)
 ├── tools/
-│   ├── webhook_receiver.py            # Flask app — receives mock WhatsApp payload
-│   ├── language_detector.py           # Detects PT-BR, flags as LATAM lead
-│   ├── qualification_engine.py        # LLM qualification + routing logic
-│   ├── response_generator.py          # Generates Quinn's reply in English
-│   └── salesforce_logger.py          # Mock Salesforce lead logger
+│   ├── webhook_receiver.py            # Flask app — /webhook endpoint, orchestrates the pipeline
+│   ├── language_detector.py           # langdetect, deterministic, no LLM
+│   ├── qualification_engine.py        # LangChain + Pydantic-typed structured output
+│   ├── response_generator.py          # LangChain ChatPromptTemplate + ChatAnthropic
+│   └── salesforce_logger.py           # Mock Salesforce lead logger, idempotent on telnyx_message_id
+├── ui/
+│   ├── app.py                         # Streamlit demo UI — default for live demo
+│   └── README.md                      # How to run the UI
 ├── mock_data/
-│   └── sample_messages.json           # Sample inbound WhatsApp payloads for demo
-├── README.md                          # What was built and why (for repo submission)
-└── demo_script.md                     # Talking points for the 35-minute presentation
+│   ├── sample_messages.json           # 3 Telnyx-shaped sample inbounds for demo
+│   └── README.md                      # Schema notes
+├── output/
+│   └── salesforce_mock.json           # The "CRM" — pre-seeded with one prior lead
+└── diagrams/
+    ├── README.md                      # Index of diagrams + when to use which format
+    ├── architecture-overview.mmd      # Mermaid source (embedded in main README)
+    ├── architecture-overview.excalidraw    # Standalone Excalidraw version
+    ├── qualification-engine-internals.excalidraw
+    ├── response-generator-internals.excalidraw
+    └── presentation-canvas.excalidraw # All three diagrams stacked for live demo
 ```
 
 ---
@@ -106,12 +125,13 @@ This project follows the WAT framework (Workflows → Agent → Tools).
 
 ## Demo Risk Flags
 
-- **Flask server must be running before demo** — start it before the call, not during
-- **Claude API key must be in .env and loaded** — test this the night before
-- **Mock payload must feel realistic** — use a real Brazilian company name and use case
-- **Response latency** — WhatsApp is async; 4-7s round trip from two sequential Sonnet calls is fine for the channel (users tolerate seconds-to-minutes for human replies). The "Quinn is thinking..." indicator in `main.py` covers it on stage. Cost optimization (Haiku for replies) belongs in "what I'd build next," not the POC.
-- **Don't demo from an empty state** — pre-load one completed qualification in the logger so
-  there's existing data to show before the live run
+- **Two services must be running before demo** — Flask (`tools/webhook_receiver.py`) AND Streamlit (`streamlit run ui/app.py`). Start both before the call, not during. Have a third terminal ready for the CLI fallback (`python main.py`).
+- **Port 5000 is taken by macOS AirPlay Receiver** — use `WEBHOOK_PORT=5050` (already the default in `webhook_receiver.py`). Disable AirPlay Receiver in System Settings if 5050 is also taken.
+- **Each terminal needs `cd` into project + `source .venv/bin/activate`** — common trip-up; you'll see `streamlit: command not found` or `python: can't open file 'tools/webhook_receiver.py'` if missed.
+- **Claude API key must be in `.env` and loaded** — `ANTHROPIC_API_KEY=...`. Test the night before.
+- **Mock payload must feel realistic** — use a real Brazilian company name and use case for the custom-message demo (Nubank, Stone, Conta Simples, etc.).
+- **Response latency** — WhatsApp is async; 5-7s round trip from two sequential Sonnet calls is fine for the channel (users tolerate seconds-to-minutes for human replies). The "Quinn is thinking..." spinner in the Streamlit UI covers it on stage. Cost optimization (Haiku for replies, etc.) belongs in "what I'd build next," not the POC.
+- **Don't demo from an empty state** — reset `output/salesforce_mock.json` to just the Lucas Pereira seed before the call (`git checkout output/salesforce_mock.json`).
 
 ---
 
@@ -128,10 +148,12 @@ This project follows the WAT framework (Workflows → Agent → Tools).
 
 ## What I'd Do Next (with more time)
 
-1. **Salesforce/Marketo sync watchdog** — directly addresses the lag pain Niamh named
-2. **Live Telnyx WhatsApp Business API** — swap mock webhook for real credentials once launched
-3. **Outbound WhatsApp sequences** — Quinn initiates LATAM outbound via WhatsApp, not just email
-4. **Conversation memory** — multi-turn qualification flow, not single-message scoring
+1. **Salesforce/Marketo sync watchdog** — directly addresses the lag pain Niamh named. Same architecture (LangChain tools, Claude as the reasoner, SOP-first design).
+2. **Live Telnyx WhatsApp Business API** — swap the mock webhook for real credentials once launched. The Telnyx-shaped payload contract is already defined in `mock_data/sample_messages.json`, so this is a one-day swap.
+3. **Outbound WhatsApp sequences** (Day 1, Day 3, Day 7) — Quinn initiates LATAM outbound via WhatsApp, not just email. Needs a workflow engine (Temporal, Prefect, or LangGraph) for durable timers + multi-day state — the linear pipeline pattern stops fitting at this point.
+4. **Conversation memory** — multi-turn qualification via LangChain `ChatMessageHistory` (or LangGraph for stateful graph orchestration). The `qualification_engine` becomes a node in a stateful graph instead of a stateless function.
+5. **`@tool` schemas + `AgentExecutor`** — promote each tool from a plain function to an `@tool`-decorated callable when Quinn becomes a tool-calling agent.
+6. **`RunnableSequence` + LangSmith** — wrap the orchestrator in LCEL once volume justifies the tracing/retry infrastructure.
 
 ---
 
