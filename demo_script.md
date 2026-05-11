@@ -23,25 +23,29 @@ webhook server already running before the call starts.
 ## 5:00–20:00 — Live demo
 
 **Setup checklist (do this BEFORE the call):**
-- [ ] Webhook running on port 5050: `python tools/webhook_receiver.py` in a visible terminal (port 5050 is the default; AirPlay Receiver squats on 5000 on macOS)
+- [ ] Webhook running on port 5050: `WEBHOOK_PORT=5050 python tools/webhook_receiver.py` in a visible terminal (port 5050 is the default; AirPlay Receiver squats on 5000 on macOS)
+- [ ] Streamlit UI running: `streamlit run ui/app.py` in a second terminal — browser auto-opens at `http://localhost:8501`
 - [ ] `.env` loaded with `ANTHROPIC_API_KEY` and `WEBHOOK_PORT=5050`
 - [ ] `output/salesforce_mock.json` reset to just the Lucas Pereira seed (`git checkout output/salesforce_mock.json` if needed)
-- [ ] Second terminal open, ready to run `python main.py`
-- [ ] One smoke test before the call: run `python main.py` and verify it succeeds, then reset the mock again
+- [ ] Browser tab on the Streamlit URL, sized to fit the share-screen
+- [ ] One smoke test before the call: load msg-001 in the UI → click Send → verify it works, then reset the mock again
+- [ ] Third terminal open as a CLI fallback, ready to run `python main.py` if the UI breaks
 
 **If something breaks live:**
-- Webhook crashed → Ctrl+C the runaway, restart `python tools/webhook_receiver.py`, re-fire `python main.py`
+- Webhook crashed → Ctrl+C the runaway, restart `WEBHOOK_PORT=5050 python tools/webhook_receiver.py`, retry the UI
+- Streamlit crashed / browser broken → drop to CLI demo: `python main.py --message-id msg-001-hot-latam`
 - Network/Claude error → fall back to the pre-seeded record: "Here's a previous run from yesterday — the architecture is the same"
 - Terminal output garbled → `clear && python main.py` to give a clean frame
-- All else fails → switch to the architecture diagram + code walkthrough early; you've already shown the demo works in your README screenshots/recording
+- All else fails → switch to the architecture diagram + code walkthrough early; you've already shown the demo works in your README and the diagrams folder
 
-**Demo sequence:**
+**Demo sequence (with UI):**
 
-1. **Show the pre-seeded "CRM"** — `cat output/salesforce_mock.json` → one prior lead (Lucas Pereira/Olist), source=WhatsApp
-2. **Hot lead** — `python main.py` → fintech named Conta Simples, `high/high → sdr_followup`, reply asks one clarifying question + promises 4-hour SDR follow-up
-3. **Warm lead** — `python main.py --message-id msg-002-warm-latam` → SMS pricing inquiry from Rafael, `medium/medium → sdr_followup` (the mechanical rule routes both-medium to humans), reply asks expected monthly volume
-4. **Cold deflect** — `python main.py --message-id msg-003-cold-noise` → consumer asking about a lost phone, `low/low → deflect`, polite redirect to mobile carrier
-5. **Show Salesforce** — `cat output/salesforce_mock.json` → 4 leads now (1 seed + 3 demo runs), full qualification context on each
+1. **Show the pre-seeded CRM** — point at the Streamlit sidebar: one prior lead (Lucas Pereira/Olist) with source=WhatsApp. "This is what's already in Salesforce before any new inbound."
+2. **Hot lead** — pick `msg-001-hot-latam` from the dropdown → form pre-fills (Mariana Costa, Conta Simples message) → click ▶ Send to Quinn. Watch the panel render: `high/high → sdr_followup`, Quinn's reply asking call volume + promising 4-hour SDR follow-up. Sidebar updates with the new record.
+3. **Warm lead** — pick `msg-002-warm-latam` → Send. Land the warm-lead callout: `medium/medium → sdr_followup` is deliberate ("I tuned the rule to err on routing to humans"). Reply asks expected monthly volume.
+4. **Cold deflect** — pick `msg-003-cold-noise` → Send. `low/low → deflect`, Quinn politely redirects to mobile carrier. "Quinn knows when not to engage."
+5. **Custom message on the spot** — switch dropdown to "Compose custom" → type something fresh: `"Olá, sou da Nubank, estamos avaliando voice API para nosso suporte. Podemos conversar?"` → Send. Show Quinn handling unseen input correctly. This kills the "you cherry-picked the samples" objection.
+6. **Idempotency demo** — re-pick `msg-001-hot-latam` → Send. Sidebar still shows 4 records (not 5) because the logger is idempotent on `telnyx_message_id`. Point at the caption above the Send button: "Sample loaded — re-sending uses the same message id, updates the same record."
 
 **Callout to land during the warm lead beat:**
 > "You'll notice this is `medium/medium` and still routed to SDR — that's deliberate. I tuned the rule to err on routing to humans, because losing a qualified lead to a nurture sequence is more expensive than the SDR time to triage one. The `marketing_nurture` path triggers when intent is genuinely low (e.g., 'what do you do?' with no business context). None of these three samples hit that case."

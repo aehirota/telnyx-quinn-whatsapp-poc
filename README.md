@@ -34,25 +34,47 @@ cp .env.example .env
 
 ---
 
-## Run the demo
+## Run the demo (with UI — recommended)
 
-Two terminals.
+Two terminals. **Each new terminal needs to be in the project directory with the venv activated** — that's where `python` resolves to your installed packages and `streamlit` is on PATH.
 
-**Terminal 1** — start the webhook (keep it running):
+**Terminal 1** — start the Flask webhook (keep it running):
 ```bash
-python tools/webhook_receiver.py
+cd /path/to/telnyx-quinn-whatsapp-poc
+source .venv/bin/activate
+WEBHOOK_PORT=5050 python tools/webhook_receiver.py
 ```
 
-**Terminal 2** — fire a sample message at it:
+**Terminal 2** — start the Streamlit UI:
+```bash
+cd /path/to/telnyx-quinn-whatsapp-poc
+source .venv/bin/activate
+streamlit run ui/app.py
+```
+
+Browser auto-opens at `http://localhost:8501`. Pick a sample from the dropdown (or compose a custom message), click **▶ Send to Quinn**, watch the qualification + reply render visually. The sidebar shows the live Salesforce CRM mock.
+
+You'll know the venv is active when your shell prompt shows `(.venv)`. If `streamlit: command not found` or `python: can't open file 'tools/webhook_receiver.py'`, you missed one of the two preamble lines.
+
+Full UI documentation: [ui/README.md](ui/README.md).
+
+## Run the demo (CLI fallback)
+
+If the UI breaks or you prefer a terminal demo:
+
+**Terminal 1** — Flask (same as above, with `cd` + `source .venv/bin/activate` first):
+```bash
+WEBHOOK_PORT=5050 python tools/webhook_receiver.py
+```
+
+**Terminal 2** — fire a sample directly (also `cd` + `source .venv/bin/activate` first):
 ```bash
 python main.py                              # default: hot LATAM lead
 python main.py --message-id msg-002-warm-latam
 python main.py --message-id msg-003-cold-noise
 ```
 
-You'll see the language detection, qualification scores, Quinn's generated
-reply, and a logged Salesforce record id — round trip is ~5–7s, fast for an
-async channel where users tolerate seconds-to-minutes for human replies.
+You'll see the language detection, qualification scores, Quinn's reply, and the logged Salesforce record id — round trip is ~5–7s, fast for an async channel where users tolerate seconds-to-minutes for human replies.
 
 To watch the leads accumulate:
 ```bash
@@ -138,3 +160,4 @@ Full SOP and prompts: [workflows/whatsapp-qualification.md](workflows/whatsapp-q
 | `output/salesforce_mock.json` | The "CRM" — pre-seeded with one prior lead |
 | `demo_script.md` | 35-minute presentation script |
 | `diagrams/` | Excalidraw architecture diagrams (overview + LangChain internals of each LLM tool); see [`diagrams/README.md`](diagrams/README.md) |
+| `ui/` | Streamlit demo UI — visual front-end for the live demo; see [`ui/README.md`](ui/README.md) |
