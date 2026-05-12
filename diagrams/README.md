@@ -28,12 +28,12 @@ The two internals diagrams are Excalidraw-only because they include Pydantic sch
 
 **Alternative:** open the file in any tool that speaks Excalidraw scene JSON (the official `excalidraw` desktop app, the `excalidraw` VS Code extension, etc.).
 
-## Live shareable URLs (snapshot at time of export)
+## Live shareable URLs (point-in-time snapshots)
 
-These render the same diagrams without needing to download anything. Useful for embedding in slides/decks.
+These were uploaded once and render that snapshot. They do **not** auto-update when the local `.excalidraw` files change. The local files in this folder are always the source of truth.
 
-- Architecture overview: https://excalidraw.com/#json=zip1EnsMy76ihfJgo78-c,V3dm1qy-TSNi2CLA1aAT_w
+- ⚠️ Architecture overview: ~~`https://excalidraw.com/#json=zip1EnsMy76ihfJgo78-c,V3dm1qy-TSNi2CLA1aAT_w`~~ **(stale — predates the Streamlit UI being added as a parallel trigger; drag-drop `architecture-overview.excalidraw` for the current version)**
 - `qualification_engine` internals: https://excalidraw.com/#json=hjTOG3vUO_1vvLYGhPcv-,KXkVtamPcJFTVtoGeRfUMg
 - `response_generator` internals: https://excalidraw.com/#json=A5-8c8ZkI738X-blQVPpX,vWG2kd-fEeDeSbNCTaOUIw
 
-If a URL ever stops working (excalidraw.com URL format changes, etc.), regenerate by uploading the matching `.excalidraw` file to the editor.
+To get a fresh shareable URL: open excalidraw.com, drag-drop the `.excalidraw` file, then use the "Share" button (top right) → "Shareable link" to generate a new one.
