@@ -147,12 +147,12 @@ Full SOP and prompts: [workflows/whatsapp-qualification.md](workflows/whatsapp-q
 
 ## What I'd build next (with more time)
 
-1. **Salesforce/Marketo sync watchdog** — directly addresses the lag pain Niamh named in the interview
-2. **Live Telnyx WhatsApp Business API** — swap the mock webhook for real credentials once launched
-3. **Outbound WhatsApp sequences** — Quinn initiates LATAM outbound via WhatsApp, not just inbound. Needs a workflow engine (Temporal/Prefect) for durable timers + multi-day state — pipeline pattern doesn't fit anymore.
-4. **Conversation memory** — multi-turn qualification via LangChain `ChatMessageHistory`, not single-message scoring
-5. **`@tool` schemas + `AgentExecutor`** — when Quinn becomes a tool-calling agent (e.g., for the Salesforce watchdog flow), promote each tool from a plain function to an `@tool`-decorated callable
-6. **`RunnableSequence` + LangSmith** — wrap the orchestrator in LCEL once volume justifies the tracing/retry infrastructure
+1. **Multi-turn conversations** — qualify across 3-5 messages via LangChain `ChatMessageHistory` (or LangGraph for state). Single-message scoring is the floor; most obvious depth signal for the demo'd feature.
+2. **Live Telnyx WhatsApp Business API** — swap the mock webhook for real credentials when GA ships. Timing-gated on Telnyx's own product launch.
+3. **Salesforce/Marketo sync watchdog** — directly addresses the lag pain Niamh named in the interview. Same architecture pattern, broader Quinn-wide value.
+4. **Outbound WhatsApp sequences** — Quinn initiates LATAM outbound via WhatsApp, not just inbound. Needs a workflow engine (Temporal/Prefect/LangGraph) for durable timers + multi-day state — pipeline pattern doesn't fit anymore.
+5. **`RunnableSequence` + LangSmith** — wrap the orchestrator in LCEL once volume justifies the tracing/retry infrastructure.
+6. **`@tool` schemas + `AgentExecutor`** — when Quinn becomes a tool-calling agent, promote each tool from a plain function to an `@tool`-decorated callable.
 
 ---
 

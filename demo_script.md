@@ -103,13 +103,13 @@ Open in this order, ~1 minute each:
 
 Frame this as: "You hired me, what does week one and week two look like?"
 
-1. **Week 1 — Salesforce/Marketo sync watchdog.** Niamh named the lag pain explicitly in our interview. This addresses it directly: monitor sync delays, alert before they become attribution problems, optionally trigger backfills. Same architecture — LangChain tools, Claude as the reasoner, SOP-first design. Ship in week one.
+1. **Week 1 — Multi-turn conversations.** Single-message qualification is the floor — a real LATAM lead takes 3–5 messages to qualify properly. Add LangChain `ChatMessageHistory` (or LangGraph for stateful graph orchestration) so Quinn carries context across messages from the same sender. `qualification_engine` becomes a node in a stateful graph instead of a stateless function — same contract, different orchestration layer. Most obvious depth signal for the feature I just demoed.
 
-2. **Week 2 — Live Telnyx WhatsApp Business.** Once GA credentials exist, swap the mock webhook. Less than a day of work because the contract is already defined in the SOP.
+2. **Week 2 (or whenever WhatsApp Business ships) — Live Telnyx WhatsApp Business API.** Swap the mock webhook for real credentials. Less than a day of work because the Telnyx-shaped payload contract is already defined in `mock_data/sample_messages.json`. Timing-gated on Telnyx's own GA — when GA ships, this becomes Day 1.
 
-3. **Week 3 — Outbound WhatsApp sequences.** Today Quinn outbounds via 10 mailboxes. Adding WhatsApp as an outbound channel for LATAM doubles the surface area without doubling the SDR cost. This is where we'd actually need a workflow engine (Temporal, Prefect, or LangGraph) — durable timers + multi-day state. The pipeline pattern stops fitting and we graduate to a real orchestrator.
+3. **Week 3 — Salesforce/Marketo sync watchdog.** Niamh named the lag pain explicitly in our interview. Same architecture pattern as this POC — LangChain tools, Claude as the reasoner, SOP-first design. Monitor sync delays, alert before they become attribution problems, optionally trigger backfills. Broader Quinn-wide value, not just this channel.
 
-4. **Week 4+ — Conversation memory.** Multi-turn qualification via LangChain `ChatMessageHistory`. The single-message demo is the floor, not the ceiling — a real LATAM lead might take 3–5 messages to qualify properly.
+4. **Week 4+ — Outbound WhatsApp sequences.** Today Quinn outbounds via 10 mailboxes. Adding WhatsApp as an outbound channel for LATAM doubles the surface area without doubling the SDR cost. This is where we'd actually need a workflow engine (Temporal, Prefect, or LangGraph) — durable timers + multi-day state. The pipeline pattern stops fitting and we graduate to a real orchestrator.
 
 **Closing line:**
 > "The reason this took two days, not two weeks, is that the architecture
