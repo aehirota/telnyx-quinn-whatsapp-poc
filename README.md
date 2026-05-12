@@ -8,6 +8,8 @@ Portuguese-speaking SDRs. Quinn currently has zero WhatsApp presence. This POC
 dogfoods Telnyx's own product to extend Telnyx's own AI SDR — and demonstrates
 the architecture in 35 minutes, end-to-end.
 
+**Business case:** see [BUSINESS_CASE.md](BUSINESS_CASE.md) for the ROI math — Fermi estimate with three scenarios (pessimistic floor: ~$86K/year incremental ARR; conservative: ~$420K/year; post-WhatsApp-Business-GA: ~$5–19M/year), plus the asymmetric downside of NOT shipping it before GA.
+
 ---
 
 ## What it does
@@ -159,6 +161,7 @@ Full SOP and prompts: [workflows/whatsapp-qualification.md](workflows/whatsapp-q
 | Path | Purpose |
 |------|---------|
 | `CLAUDE.md` | Project charter, evaluation criteria, demo risk flags |
+| `BUSINESS_CASE.md` | ROI math (3 scenarios) + assumptions + what to validate Day-1 |
 | `workflows/whatsapp-qualification.md` | SOP — read this for the full flow |
 | `tools/` | Five single-purpose scripts (one per pipeline stage) |
 | `mock_data/sample_messages.json` | Three Telnyx-shaped sample payloads |

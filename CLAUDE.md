@@ -66,6 +66,7 @@ Build a WhatsApp inbound qualification handler that extends Quinn with:
 telnyx-quinn-whatsapp-poc/
 ├── CLAUDE.md                          # This file — project charter, evaluation criteria
 ├── README.md                          # Setup, run, what was built and why (repo entry point)
+├── BUSINESS_CASE.md                   # ROI math: 3 scenarios, assumptions, what to validate Day-1
 ├── demo_script.md                     # 35-minute presentation script with talk track
 ├── requirements.txt                   # Python deps (Flask, LangChain, Pydantic, Streamlit, etc.)
 ├── .env                               # API keys — never commit (gitignored)

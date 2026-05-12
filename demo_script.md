@@ -14,6 +14,12 @@ webhook server already running before the call starts.
 - The gap: inbound LATAM leads on WhatsApp today either bounce, get a delayed email reply, or land on an SDR's personal phone
 - The dogfooding angle: extending Quinn with Telnyx's own soon-to-launch product
 
+**Open `BUSINESS_CASE.md` on screen for the last ~90 seconds of this section** — walk through the three scenarios in the TL;DR table:
+- *"Even at the pessimistic floor — 15 messages/week, low ACV — it's ~$86K/year. Pays back the build inside one quarter."*
+- *"Conservative at today's volume: ~$420K/year incremental ARR plus dogfooding case-study value."*
+- *"Post-WhatsApp-Business-GA: ~$5-19M/year depending on volume scaling."*
+- *"The math holds even if every input is wrong by 2-3x. The asymmetric downside is the real argument: every LATAM message after GA without Quinn coverage is a leak."*
+
 **One line to land:**
 > "No other candidate will walk in with a Telnyx-on-Telnyx demo. That's the
 > point — every channel Telnyx ships should be a channel Quinn already speaks."
