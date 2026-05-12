@@ -149,12 +149,13 @@ This project follows the WAT framework (Workflows → Agent → Tools).
 
 ## What I'd Do Next (with more time)
 
-1. **Multi-turn conversations** — qualify across 3-5 messages via LangChain `ChatMessageHistory` (or LangGraph for stateful graph orchestration). Single-message scoring is the floor; a real LATAM lead takes multiple messages to qualify properly. The `qualification_engine` becomes a node in a stateful graph instead of a stateless function — same contract, different orchestration layer. Most obvious depth signal for the feature itself.
-2. **Live Telnyx WhatsApp Business API** — swap the mock webhook for real credentials when GA ships. The Telnyx-shaped payload contract is already defined in `mock_data/sample_messages.json`, so this is a one-day swap. Timing-gated on Telnyx's own product GA — Week 1 if available, otherwise as soon as it is.
-3. **Salesforce/Marketo sync watchdog** — directly addresses the lag pain Niamh named. Same architecture pattern (LangChain tools, Claude as the reasoner, SOP-first design). Broader Quinn-wide value, not just this channel.
-4. **Outbound WhatsApp sequences** (Day 1, Day 3, Day 7) — Quinn initiates LATAM outbound via WhatsApp, not just email. Needs a workflow engine (Temporal, Prefect, or LangGraph) for durable timers + multi-day state — the linear pipeline pattern stops fitting at this point.
-5. **`RunnableSequence` + LangSmith** — wrap the orchestrator in LCEL once volume justifies the tracing/retry infrastructure.
-6. **`@tool` schemas + `AgentExecutor`** — promote each tool from a plain function to an `@tool`-decorated callable when Quinn becomes a tool-calling agent.
+1. **Week 1 — Multi-turn conversations** — qualify across 3-5 messages via LangChain `ChatMessageHistory` (or LangGraph for stateful graph orchestration). Single-message scoring is the floor; a real LATAM lead takes multiple messages to qualify properly. The `qualification_engine` becomes a node in a stateful graph instead of a stateless function — same contract, different orchestration layer. Most obvious depth signal for the feature itself.
+2. **Week 1 — LangSmith observability** — set up tracing before any real LATAM traffic hits the system. ~1 hour of work (sign up, set `LANGCHAIN_API_KEY` env var, traces start flowing). Going live without observability is the classic anti-pattern. Ships in parallel with multi-turn so we observe the new behavior from day one.
+3. **Week 2 (or when GA ships) — Live Telnyx WhatsApp Business API** — swap the mock webhook for real credentials when Telnyx's product GA's. The Telnyx-shaped payload contract is already defined in `mock_data/sample_messages.json`, so this is a one-day swap. Timing-gated on Telnyx's own product launch.
+4. **Week 3 — Salesforce/Marketo sync watchdog** — directly addresses the lag pain Niamh named. Same architecture pattern (LangChain tools, Claude as the reasoner, SOP-first design). Broader Quinn-wide value, not just this channel.
+5. **Week 4+ — Outbound WhatsApp sequences** (Day 1, Day 3, Day 7) — Quinn initiates LATAM outbound via WhatsApp, not just email. Needs a workflow engine for durable timers + multi-day state — recommend **LangGraph** for stack-fit (already on LangChain, designed for LLM workflows), with Temporal/Prefect as alternatives if non-LLM workflows emerge later.
+6. **Later — `RunnableSequence`** — refactor the Flask orchestrator into an LCEL chain for declarative composition + built-in retry/streaming. Code cleanup, not a production requirement.
+7. **Later — LangGraph agent pattern** (`@tool` decorators + `create_react_agent` or custom graph) — when Quinn needs to dynamically pick which tools to run based on intermediate results (e.g., the sync watchdog branching, or open-ended BDR questions). Note: `AgentExecutor` is LangChain's older equivalent; LangGraph is the modern recommended path.
 
 ---
 

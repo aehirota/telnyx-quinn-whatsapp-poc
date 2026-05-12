@@ -105,11 +105,15 @@ Frame this as: "You hired me, what does week one and week two look like?"
 
 1. **Week 1 — Multi-turn conversations.** Single-message qualification is the floor — a real LATAM lead takes 3–5 messages to qualify properly. Add LangChain `ChatMessageHistory` (or LangGraph for stateful graph orchestration) so Quinn carries context across messages from the same sender. `qualification_engine` becomes a node in a stateful graph instead of a stateless function — same contract, different orchestration layer. Most obvious depth signal for the feature I just demoed.
 
-2. **Week 2 (or whenever WhatsApp Business ships) — Live Telnyx WhatsApp Business API.** Swap the mock webhook for real credentials. Less than a day of work because the Telnyx-shaped payload contract is already defined in `mock_data/sample_messages.json`. Timing-gated on Telnyx's own GA — when GA ships, this becomes Day 1.
+2. **Week 1 (in parallel) — LangSmith observability.** Going live without traces is the classic anti-pattern. ~1 hour of work: sign up, set `LANGCHAIN_API_KEY`, traces start flowing automatically for every chain run. Ships alongside multi-turn so we observe the new behavior from day one and never run blind on real LATAM traffic.
 
-3. **Week 3 — Salesforce/Marketo sync watchdog.** Niamh named the lag pain explicitly in our interview. Same architecture pattern as this POC — LangChain tools, Claude as the reasoner, SOP-first design. Monitor sync delays, alert before they become attribution problems, optionally trigger backfills. Broader Quinn-wide value, not just this channel.
+3. **Week 2 (or whenever WhatsApp Business ships) — Live Telnyx WhatsApp Business API.** Swap the mock webhook for real credentials. Less than a day of work because the Telnyx-shaped payload contract is already defined in `mock_data/sample_messages.json`. Timing-gated on Telnyx's own GA — when GA ships, this becomes Day 1.
 
-4. **Week 4+ — Outbound WhatsApp sequences.** Today Quinn outbounds via 10 mailboxes. Adding WhatsApp as an outbound channel for LATAM doubles the surface area without doubling the SDR cost. This is where we'd actually need a workflow engine (Temporal, Prefect, or LangGraph) — durable timers + multi-day state. The pipeline pattern stops fitting and we graduate to a real orchestrator.
+4. **Week 3 — Salesforce/Marketo sync watchdog.** Niamh named the lag pain explicitly in our interview. Same architecture pattern as this POC — LangChain tools, Claude as the reasoner, SOP-first design. Monitor sync delays, alert before they become attribution problems, optionally trigger backfills. Broader Quinn-wide value, not just this channel.
+
+5. **Week 4+ — Outbound WhatsApp sequences.** Today Quinn outbounds via 10 mailboxes. Adding WhatsApp as an outbound channel for LATAM doubles the surface area without doubling the SDR cost. This needs a workflow engine for durable timers + multi-day state. **My pick: LangGraph** — same vendor as your LangChain stack, built specifically for LLM workflows. Temporal/Prefect are alternatives for non-LLM workflow needs.
+
+6. **Later — `RunnableSequence` + LangGraph agent pattern.** Two cleanup/extensibility items: (a) refactor the Flask orchestrator into an LCEL chain for declarative composition; (b) introduce `@tool` decorators + `create_react_agent` (LangGraph's modern equivalent of `AgentExecutor`) when Quinn needs to dynamically pick which tools to run based on intermediate results — e.g., the sync watchdog branching, or open-ended BDR questions like the OpenClaw Slack agent does.
 
 **Closing line:**
 > "The reason this took two days, not two weeks, is that the architecture

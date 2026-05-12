@@ -147,12 +147,13 @@ Full SOP and prompts: [workflows/whatsapp-qualification.md](workflows/whatsapp-q
 
 ## What I'd build next (with more time)
 
-1. **Multi-turn conversations** — qualify across 3-5 messages via LangChain `ChatMessageHistory` (or LangGraph for state). Single-message scoring is the floor; most obvious depth signal for the demo'd feature.
-2. **Live Telnyx WhatsApp Business API** — swap the mock webhook for real credentials when GA ships. Timing-gated on Telnyx's own product launch.
-3. **Salesforce/Marketo sync watchdog** — directly addresses the lag pain Niamh named in the interview. Same architecture pattern, broader Quinn-wide value.
-4. **Outbound WhatsApp sequences** — Quinn initiates LATAM outbound via WhatsApp, not just inbound. Needs a workflow engine (Temporal/Prefect/LangGraph) for durable timers + multi-day state — pipeline pattern doesn't fit anymore.
-5. **`RunnableSequence` + LangSmith** — wrap the orchestrator in LCEL once volume justifies the tracing/retry infrastructure.
-6. **`@tool` schemas + `AgentExecutor`** — when Quinn becomes a tool-calling agent, promote each tool from a plain function to an `@tool`-decorated callable.
+1. **Week 1 — Multi-turn conversations** — qualify across 3-5 messages via LangChain `ChatMessageHistory` (or LangGraph for state). Single-message scoring is the floor; most obvious depth signal for the demo'd feature.
+2. **Week 1 — LangSmith observability** — set up tracing before any real LATAM traffic hits the system. ~1 hour of work; going live without observability is the classic anti-pattern.
+3. **Week 2 (or when GA ships) — Live Telnyx WhatsApp Business API** — swap the mock webhook for real credentials when Telnyx's product GA's. Timing-gated on Telnyx's own launch.
+4. **Week 3 — Salesforce/Marketo sync watchdog** — directly addresses the lag pain Niamh named in the interview. Same architecture pattern, broader Quinn-wide value.
+5. **Week 4+ — Outbound WhatsApp sequences** — Quinn initiates LATAM outbound via WhatsApp, not just inbound. Needs a workflow engine for durable timers + multi-day state — recommend **LangGraph** for stack-fit; Temporal/Prefect as alternatives for non-LLM workflows.
+6. **Later — `RunnableSequence`** — refactor the Flask orchestrator into an LCEL chain for declarative composition. Code cleanup, not a production requirement.
+7. **Later — LangGraph agent pattern** (`@tool` decorators + `create_react_agent`) — when Quinn needs to dynamically pick which tools to run based on intermediate results. (`AgentExecutor` is LangChain's older equivalent; LangGraph is the modern recommended path.)
 
 ---
 
