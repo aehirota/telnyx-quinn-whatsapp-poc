@@ -1,6 +1,6 @@
 # Process — How this POC was built
 
-This POC was vibe-coded with Claude Code (Sonnet 4) as a thinking + coding partner. The Telnyx brief invited this framing ("show us your ability to put AI tooling to work"). What follows is a log of the key decisions made along the way — what alternatives I considered, what I picked, and where I pushed back on the AI's first instinct.
+This POC was vibe-coded with Claude Code (Opus 4.7) as a thinking + coding partner. The Telnyx brief invited this framing ("show us your ability to put AI tooling to work"). What follows is a log of the key decisions made along the way — what alternatives I considered, what I picked, and where I pushed back on the AI's first instinct.
 
 The intent is to show the *process* without the noise of a full transcript dump — and to be transparent about where judgment lived (mine) vs where execution lived (collaborative).
 
