@@ -6,7 +6,7 @@ Excalidraw scene files for the architecture and LangChain internals of this POC.
 
 | File | What it shows |
 |------|---------------|
-| [`presentation-canvas.excalidraw`](presentation-canvas.excalidraw) | **Full demo deck on one canvas** — `Why this feature?` card → architecture → qualification_engine internals → response_generator internals → `Trade-offs` card → `What I'd build next` card. Open this one during the demo and pan top-to-bottom; mirrors the demo_script.md timing. |
+| [`presentation-canvas.excalidraw`](presentation-canvas.excalidraw) | **Full demo deck on one canvas** — `Why this feature?` card → architecture → qualification_engine internals → response_generator internals → `Trade-offs` card → `What I'd build next` card → `How this was built` card. Open this one during the demo and pan top-to-bottom. |
 | [`architecture-overview.mmd`](architecture-overview.mmd) | **Mermaid source** of the architecture overview — embedded inline in the main [`../README.md`](../README.md) so GitHub renders it without a click |
 | [`architecture-overview.excalidraw`](architecture-overview.excalidraw) | **Excalidraw version** of the same architecture overview — standalone, useful if you want just the overview in another context |
 | [`qualification-engine-internals.excalidraw`](qualification-engine-internals.excalidraw) | Standalone: inside `tools/qualification_engine.py` — the LCEL chain, the `ChatAnthropic` config, and the full `Qualification` Pydantic schema |
