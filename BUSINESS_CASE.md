@@ -52,20 +52,22 @@ Even cutting the optimistic case in half (account for Fermi error compounding), 
 
 ### Pessimistic stress-test — does it still pencil?
 
-What if every input is much worse than estimated? Let's pressure-test:
+What if every input is much worse than estimated? The values below are deliberately picked to be the "this could plausibly be true" floor — each one defensible, not a hypothetical worst-case bottom:
 
-| Input | Pessimistic value |
-|---|---|
-| Volume | 15 msgs/wk (60/month) |
-| Leak today | 40% (Telnyx already responds to some) |
-| Leak with Quinn | 15% (smaller delta) |
-| SQL conversion | 20% (lower) |
-| Closed-won | 12% |
-| ACV | $20K (low end of mid-market) |
+| Input | Pessimistic value | Rationale |
+|---|---|---|
+| Volume | 15 msgs/wk (60/month) | Assumes LATAM is mostly web-form inbound today and WhatsApp messaging is rare pre-GA — well below the conservative 25/wk |
+| Leak today | 40% (vs 50% conservative) | Assumes Telnyx is actually responsive to the leads they DO see, so the baseline is better than feared and there's less leak to recover |
+| Leak with Quinn | 15% (vs 10% conservative) | Assumes Quinn isn't perfect — occasionally misroutes or misses an edge case, so the post-Quinn leak is closer to industry baseline than best-in-class |
+| SQL conversion | 20% (vs 25% conservative) | Assumes LATAM inbound is lower-intent than US average (more curiosity, less buying motion in early WhatsApp adoption) |
+| Closed-won | 12% (same as conservative) | No need to be more pessimistic — this is already a defensible mid-market rate |
+| ACV | $20K (low end of $20-50K range) | Assumes mid-market LATAM deals are smaller than US baseline (currency, regional pricing, smaller volumes) |
 
 Math: 60 × 25% recovered × 20% SQL × 12% close-won = **0.36 deals/month → ~4.3 deals/year × $20K = ~$86K/year incremental ARR**
 
 **Even at this floor, the project pays back in well under one quarter of one engineer's loaded cost.** And it ignores the asymmetric downside: if Telnyx ships WhatsApp Business GA without Quinn coverage, every LATAM inbound post-launch is a leak that compounds over time. The cost of NOT shipping this grows fast.
+
+**Why this matters in the demo:** any reviewer can push on individual assumptions ("your ACV is too high", "your conversion rate is generous"). The pessimistic table is the answer: even when *every* input is dialed down to a defensible floor, the math still pencils. The argument doesn't depend on optimism.
 
 ### BDR time savings (a smaller but real line)
 
